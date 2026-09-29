@@ -13,6 +13,7 @@ depth_divisors = [1.0, 2.0, 4.0, 5.0, 6.0, 7.0]
 copy_counts = [0, 4, 8, 16]
 
 
+# can anything move this market? a momentum bloc is the most correlated flow there is
 def run(copy_count, depth_divisor):
     names = {f"MomCopy{i + 1}" for i in range(copy_count)}
     extra = [MomentumAgent(f"MomCopy{i + 1}", lookback=8, trade_fraction=0.20, hard_cap=100) for i in range(copy_count)]
@@ -48,6 +49,7 @@ def run(copy_count, depth_divisor):
             flow_impacts.append(abs(entry["liquidity_adjusted_order_flow_impact"]))
             bloc_shares.append(sum(a["executed_quantity"] for a in entry["actions"] if a["agent"] in names))
 
+    # near 0 means trading cant really move price
     flow_ratio = np.mean(flow_impacts) / VALUES["market_noise"]
     return flow_ratio, np.mean(bloc_shares), np.mean(gaps), np.median(gaps), np.mean(kurtoses)
 

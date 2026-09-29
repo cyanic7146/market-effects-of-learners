@@ -58,6 +58,7 @@ def run(market, seed, script_agents=()):
         market.step()
 
 
+# what each copy actually traded each step
 def record(market, names, seed):
     run(market, seed)
     schedules = {name: [] for name in names}
@@ -90,6 +91,7 @@ for seed in seeds:
 mean, low, high = bootstrap_ci(baseline)
 print(f"\n no bloc fixed depth kurtosis={mean:.3f} 95% ci=[{low:.3f}, {high:.3f}]")
 
+# record at scaling depth where the market holds, replay at fixed depth
 for arm, factory in arms:
     live = [factory(i) for i in range(bloc_size)]
     names = [agent.name for agent in live]
@@ -108,6 +110,7 @@ for arm, factory in arms:
         live_kurtoses.append(live_kurtosis)
         writer.writerow({"arm": arm, "stage": "recorded_at_scaling", "seed": seed, "excess_kurtosis": f"{live_kurtosis:.6f}", "bloc_volume": sum(abs(q) for name in names for q in schedules[name])})
 
+        # each script agent replays one copy's orders
         for i, agent in enumerate(scripts):
             agent.schedule = schedules[names[i]]
 

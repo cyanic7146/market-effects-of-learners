@@ -10,7 +10,7 @@ from AGENTS.informed_agent import InformedAgent
 
 seeds = list(range(1, 1001))
 informed_counts = [0, 1, 3, 6]
-signal_noises = [1.0, 2.0, 3.0, 1.5, 2.5, 0.8]
+signal_noises = [1.0, 2.0, 3.0, 1.5, 2.5, 0.8] # different noise so theyre not clones
 
 
 starting_cash = VALUES["initial_cash"]
@@ -37,6 +37,7 @@ for informed_count in informed_counts:
         prices = np.array([entry["market_price"] for entry in market.history])
         fundamentals = np.array([entry["fundamental_value"] for entry in market.history])
 
+        # corr breaks if either one is flat
         if prices.std() > 0 and fundamentals.std() > 0:
             price_fund_corrs.append(np.corrcoef(prices, fundamentals)[0, 1])
         average_gaps.append(np.mean(np.abs(prices - fundamentals) / fundamentals) * 100)

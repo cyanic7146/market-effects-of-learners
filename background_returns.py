@@ -20,8 +20,11 @@ seeds = list(range(1, num_seeds + 1))
 COPY_COUNT = 16
 depth_agents = 25
 output = "background_returns.csv"
+# output = "background_returns_thin.csv"
 depth_divisor = 1.0
+# depth_divisor = 4.0
 spread = False
+# spread = True
 VALUES["market_spread_enabled"] = spread
 
 calm_model = "MODELS/best_model_calm_31obs_checkpoint/best_model"
@@ -59,6 +62,7 @@ populations = [
 ]
 
 
+# avg % return for a group of agents
 def percent_return(agents, price):
     finals = []
     for agent in agents:
@@ -71,10 +75,11 @@ def measure(population, copy_count, fixed_depth, writer):
         extra = [dict(populations)[population](i) for i in range(copy_count)]
     else:
         extra = []
-    background = make_agents()
+    background = make_agents() # the normal 24
     market = Market(background + extra, OrnsteinUhlenbeckFundamental())
     market.quiet = True
 
+    # fixed depth: maker sized like there are 25 agents
     if fixed_depth:
         market.market_starting_cash = VALUES["market_base_cash"] + VALUES["market_cash_per_agent"] * depth_agents
         market.market_starting_inventory = VALUES["market_base_inventory"] + VALUES["market_inventory_per_agent"] * depth_agents
@@ -98,6 +103,7 @@ def measure(population, copy_count, fixed_depth, writer):
             bloc_return = percent_return(extra, market.price)
         else:
             bloc_return = 0.0
+        # market maker marked at the final price
         maker_start = market.market_starting_cash + market.market_starting_inventory * VALUES["initial_price"]
         maker_end = market.market_cash + market.market_inventory * market.price
         maker_pnl = (maker_end - maker_start) / maker_start * 100

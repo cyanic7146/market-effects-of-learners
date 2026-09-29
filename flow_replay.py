@@ -15,25 +15,31 @@ from market_quality import excess_kurtosis, returns_from, bloc_flow_size, bootst
 num_seeds = 500
 seeds = list(range(1, num_seeds + 1))
 output = "flow_replay.csv"
+# output = "flow_replay_d2.csv"
+# output = "flow_replay_d6.csv"
 bloc_size = 16
 depth_agents = 25
 depth_divisor = 4.0
+# depth_divisor = 2.0
+# depth_divisor = 6.0
 spread = True
 VALUES["market_spread_enabled"] = spread
 
 total_volumes = [4800, 9600, 14400]
-ACTIVE_STEPS = [300, 100, 30, 10]
+ACTIVE_STEPS = [300, 100, 30, 10] # 300 is a trickle, 10 is a burst
 shapes = ["spaced", "paired"]
 run_active_steps = 60
 run_quantities = [10, 20]
 run_lengths = [1, 2, 4, 10, 20]
-script_cash = 200000.0
+script_cash = 200000.0 # enough that cash never cuts the schedule short
 
 
+# every scripted agent gets the same schedule, sign flips so position goes back to 0
 def bloc_schedule(total_volume, active_steps, shape, run_length, num_steps):
     quantity = int(round(total_volume / (bloc_size * active_steps)))
     schedule = [0] * num_steps
 
+    #same direction for run_length steps in a row
     if shape == "run":
         runs = active_steps // run_length
         spacing = num_steps // runs
@@ -87,6 +93,7 @@ def measure(total_volume, active_steps, shape, fixed_depth, writer, run_length=1
         market.fundamental_process.rng = env_rng
         random.seed(seed)
         market.reset(VALUES["initial_cash"])
+        # reset script cash each episode
         for agent in extra:
             agent.cash = script_cash
         for i in range(VALUES["num_steps"]):
@@ -149,6 +156,7 @@ for fixed_depth in [False, True]:
                     fill = 0.0
                 print(f"  vol={scheduled} {shape} over {active_steps} steps kurtosis={mean:.3f} 95% ci=[{low:.3f}, {high:.3f}] shift={shift:+.3f} [{shift_low:+.3f}, {shift_high:+.3f}] sep={separated} filled={fill:.1f}%")
 
+    # runs: same peak, different run lengths
     for quantity in run_quantities:
         print("")
         for run_length in run_lengths:

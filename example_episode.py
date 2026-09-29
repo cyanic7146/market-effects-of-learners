@@ -39,6 +39,7 @@ def run(market, seed):
     return list(market.history)
 
 
+# pick a typical broken episode, not the worst one
 broken = {}
 for row in csv.DictReader(open("sweep_thin.csv")):
     if row["depth"] == "fixed" and row["population"] == "rl_homogeneous" and int(row["copies"]) == bloc_size and float(row["excess_kurtosis"]) > BROKEN:
@@ -54,10 +55,12 @@ for seed in candidates:
     inventory = []
     for entry in with_bloc:
         inventory.append(entry["market_inventory"])
+    # maker has to actually hit 0
     if kurtosis > BROKEN and min(inventory) == 0:
         break
 without = run(none_market, seed)
 
+# should be ~0 since its the same random path
 fundamental_gap = max(abs(a["fundamental_value"] - b["fundamental_value"]) for a, b in zip(without, with_bloc))
 prices = []
 for entry in with_bloc:

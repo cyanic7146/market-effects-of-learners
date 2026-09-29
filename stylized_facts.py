@@ -10,7 +10,7 @@ from market_quality import autocorrelation
 
 
 num_sims = 100
-steps_per_sim = 1000
+steps_per_sim = 1000 # longer runs, steadier acf
 
 
 def collect_runs(order_flow_impact=None):
@@ -47,6 +47,7 @@ def report(label, all_returns, all_volumes):
     skew = ((pooled - mean_r) ** 3).mean() / std_r ** 3
     excess_kurtosis = ((pooled - mean_r) ** 4).mean() / std_r ** 4 - 3
 
+    # acf per sim then averaged so sims dont get mixed together
     lags = [1, 2, 5, 10, 20]
     return_acf = {}
     for lag in lags:
@@ -82,6 +83,7 @@ report("baseline", returns, volumes)
 
 saved_switch = VALUES["regime_switch_chance"]
 saved_length = VALUES["regime_length"]
+# regimes off, should kill most of the volatility clustering
 VALUES["regime_switch_chance"] = 0.0
 VALUES["regime_length"] = 10 ** 9
 returns, volumes = collect_runs()
@@ -90,10 +92,12 @@ VALUES["regime_switch_chance"] = saved_switch
 VALUES["regime_length"] = saved_length
 
 saved_event = VALUES["event_chance"]
+# no events, tails should get thinner
 VALUES["event_chance"] = 0.0
 returns, volumes = collect_runs()
 report("no event shocks", returns, volumes)
 VALUES["event_chance"] = saved_event
 
+# no order flow impact, volume/vol link should get weaker
 returns, volumes = collect_runs(order_flow_impact=0.0)
 report("no order flow impact", returns, volumes)

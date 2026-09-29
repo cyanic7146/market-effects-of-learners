@@ -12,7 +12,7 @@ from AGENTS.rl_agent import RLAgent
 
 seeds = list(range(1, 1001))
 copy_counts = [1, 2, 4, 8]
-fixed_depth = False
+fixed_depth = False # True pins depth at 25 agents
 depth_agents = 25
 
 
@@ -25,6 +25,7 @@ else:
         print(f"depth pinned at {depth_agents} agents")
     print()
 
+    # keep per seed so 1 copy vs 8 copies can be paired
     per_seed_by_count = {}
 
     for copy_count in copy_counts:
@@ -64,6 +65,7 @@ else:
         per_seed_by_count[copy_count] = np.array(per_copy_finals)
         print(f"  {copy_count} copies: per-copy avg={average_copy:.2f} return={average_return:.2f}% beat_bah={beat_bah}/{len(seeds)}")
 
+    #does the edge go away with more copies
     one = per_seed_by_count[copy_counts[0]]
     many = per_seed_by_count[copy_counts[-1]]
     differences = (one - many) / starting_cash * 100

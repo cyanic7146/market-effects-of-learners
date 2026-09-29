@@ -18,13 +18,17 @@ from market_quality import excess_kurtosis, mean_abs_gap, returns_from, bloc_flo
 num_seeds = 1000
 seeds = list(range(1, num_seeds + 1))
 copy_counts = [1, 2, 4, 8, 16]
-append = False
+append = False # True adds rows to the csv instead of starting over
 depth_agents = 25
 output = "sweep.csv"
+# output = "sweep_thin.csv"
 depth_divisor = 1.0
+# depth_divisor = 4.0
 spread = False
+# spread = True
 VALUES["market_spread_enabled"] = spread
 
+# calm model, only used for half the mixed bloc
 calm_model = "MODELS/best_model_calm_31obs_checkpoint/best_model"
 calm_normalizer = "MODELS/vec_normalize_calm.pkl"
 
@@ -41,10 +45,12 @@ def random_copy(i):
     return RandomAgent(f"Copy{i + 1}", trade_fraction=0.25, hard_cap=100)
 
 
+# trained with shorts off, might try allow_short later
 def rl_copy(i):
     return RLAgent(f"Copy{i + 1}")
 
 
+# every other copy gets the calm model
 def rl_mixed_copy(i):
     if i % 2 == 0:
         return RLAgent(f"Copy{i + 1}")
@@ -71,14 +77,17 @@ def measure(population, copy_count, fixed_depth, writer):
     market = Market(make_agents() + extra, OrnsteinUhlenbeckFundamental())
     market.quiet = True
 
+    # fixed depth: maker sized like there are 25 agents
     if fixed_depth:
         market.market_starting_cash = VALUES["market_base_cash"] + VALUES["market_cash_per_agent"] * depth_agents
         market.market_starting_inventory = VALUES["market_base_inventory"] + VALUES["market_inventory_per_agent"] * depth_agents
 
+    # depth_divisor over 1 makes it a thin market
     market.market_starting_cash = market.market_starting_cash / depth_divisor
     market.market_starting_inventory = int(market.market_starting_inventory / depth_divisor)
 
     kurtoses = []
+    # same seeds for every population so they can be paired
     for seed in seeds:
         env_rng = random.Random(seed)
         market.rng = env_rng
@@ -124,6 +133,7 @@ writer = csv.DictWriter(output_file, fieldnames=fields)
 if not append:
     writer.writeheader()
 
+#scaling depth first then fixed
 for fixed_depth in [False, True]:
     print(f"\nfixed_depth={fixed_depth}")
 

@@ -19,6 +19,7 @@ depth_agents = 25
 depth_divisor = 4.0
 copy_counts = [0, 8, 16]
 
+# the reference market had both of these off
 flag_sets = [
     ("reference", False, False),
     ("intra_step", True, False),
@@ -31,6 +32,7 @@ def measure(copy_count, intra_step, spread, writer):
     VALUES["intra_step_impact"] = intra_step
     VALUES["market_spread_enabled"] = spread
 
+    # the rl copies never trained with these on
     extra = [RLAgent(f"Copy{i + 1}") for i in range(copy_count)]
     market = Market(make_agents() + extra, OrnsteinUhlenbeckFundamental())
     market.quiet = True

@@ -22,10 +22,11 @@ depth_agents = 25
 depth_divisor = 4.0
 VALUES["market_spread_enabled"] = True
 script_cash = 200000.0
+# 16 agents x 22 shares x 4 steps, about the rl blocs biggest run
 run_quantity = 22
 RUN_LENGTH = 4
-run_start = 100
-BROKEN = 10.0
+run_start = 100 # arbitrary
+BROKEN = 10.0 # excess kurtosis above this = broken
 
 
 def build(extra, fixed_depth):
@@ -60,6 +61,7 @@ def single_run(buy_start, sell_start):
     return schedule
 
 
+# runs on a clock, direction flips every run
 def alternating(quantity, run_length, runs):
     schedule = [0] * VALUES["num_steps"]
     spacing = VALUES["num_steps"] // runs
@@ -72,6 +74,7 @@ def alternating(quantity, run_length, runs):
     return schedule
 
 
+# from the schedule, not from what actually filled
 def schedule_stats(scripts):
     if not scripts:
         return 0, 0, 0, 0.0, 0
@@ -148,6 +151,7 @@ for arm, factory in [("momentum replayed", lambda i: MomentumAgent(f"Copy{i + 1}
         kept.append(n)
     results[arm] = (np.array(kurtoses), np.array(emptied), np.array(kept))
 
+# one rl sized run given back after 30, 100 or never, then clock runs at 4 sizes
 cells = [
     ("one run, sold back after 30 steps", single_run(run_start, run_start + 30)),
     ("one run, sold back after 100 steps", single_run(run_start, run_start + 100)),

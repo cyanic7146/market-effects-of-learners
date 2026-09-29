@@ -19,6 +19,7 @@ def load(path):
     return rows
 
 
+# who pays for the bloc, the background agents, the maker or nobody
 for path, label in [("background_returns.csv", "reference market"), ("background_returns_thin.csv", "thin market")]:
     rows = load(path)
     for depth in ["scaling", "fixed"]:

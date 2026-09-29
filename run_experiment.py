@@ -18,6 +18,7 @@ from market import Market
 seeds = list(range(1, 1001))
 
 
+# 24 background agents, 3 of each type with different settings
 def make_agents():
     return [
         RandomAgent("Random1", trade_fraction=0.20, hard_cap=80),
@@ -70,6 +71,7 @@ def sharpe_of_path(path):
     return mean_return / variance ** 0.5
 
 
+# never traded, dont count that as zero risk
 def path_never_moved(path):
     return max(path) == min(path)
 
@@ -128,6 +130,7 @@ def run_experiment():
             idle_note = ""
         print(f"  {name}: avg={average_portfolio:.2f} return={average_return:.2f}% beat_bah={times_beat_bah}/{num_seeds} sharpe={average_sharpe:.3f} maxdd={average_drawdown:.1f}% cvar5={cvar:.2f}%{idle_note}")
 
+    # add more rl models to this list if you train more checkpoints
     rl_models = [
         ("MODELS/best_model_31obs_checkpoint/best_model", "MODELS/vec_normalize.pkl"),
         ("MODELS/best_model_calm_31obs_checkpoint/best_model", "MODELS/vec_normalize_calm.pkl"),

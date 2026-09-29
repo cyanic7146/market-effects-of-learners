@@ -68,6 +68,7 @@ def dose_response(rows, measure, label, filename, log_scale):
     plt.close(figure)
 
 
+# kurtosis vs one-directional demand as % of what the maker holds
 def threshold(paths, filename):
     figure, axis = plt.subplots(figsize=(7, 4.4))
     markers = {"spaced": "o", "paired": "s", "run": "^"}
@@ -148,6 +149,7 @@ def recorded(path, filename):
     plt.close(figure)
 
 
+# the methods diagram
 def workflow(filename):
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
     figure, axis = plt.subplots(figsize=(11, 5.2))

@@ -7,6 +7,7 @@ from market_quality import bootstrap_ci
 
 
 sweep_csv = "sweep.csv"
+# sweep_csv = "sweep_thin.csv"
 measures = ["excess_kurtosis", "mean_abs_gap"]
 BLOC = ["bloc_flow_corr", "bloc_mean_flow", "bloc_peak_flow", "bloc_demand_pct", "bloc_longest_run"]
 
@@ -28,6 +29,7 @@ populations = ["momentum", "informed", "random", "rl_homogeneous", "rl_heterogen
 copy_counts = sorted({k[2] for k in rows if k[2] > 0})
 
 
+# same seed with and without the bloc so only the bloc is different
 def paired_shift(depth, population, copies, measure):
     baseline = rows[(depth, "none", 0)]
     treated = rows[(depth, population, copies)]
@@ -72,6 +74,7 @@ for depth in depths:
                 peak_to_mean = 0.0
             print(f"  {population} {copies} {mean_flow:.2f} {peak_flow:.1f} {peak_to_mean:.2f} {np.mean(stats['bloc_demand_pct']):.1f}% {np.mean(stats['bloc_longest_run']):.1f} {np.mean(stats['bloc_flow_corr']):.3f}")
 
+# rank everything at the biggest N
 top = max(copy_counts)
 for depth in depths:
     effect = {}

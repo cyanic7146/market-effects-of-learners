@@ -26,6 +26,7 @@ def autocorrelation(series, lag):
     return float((a * b).sum() / denom)
 
 
+# per seed, pooling seeds together inflates it
 def excess_kurtosis(returns):
     returns = np.asarray(returns)
     std = returns.std()
@@ -44,6 +45,7 @@ def mean_abs_gap(history):
     return float(np.mean(np.abs(mispricing(history))) * 100)
 
 
+# resamples seeds, in chunks of 500 so memory doesnt blow up
 def bootstrap_ci(values, confidence=0.95, resamples=10000, seed=0):
     values = np.asarray(values, dtype=float)
     if len(values) == 0:
@@ -72,6 +74,7 @@ def bloc_flows(history, names):
     return flows
 
 
+# avg pairwise corr of the copies signed flow
 def bloc_flow_correlation(history, names):
     names = list(names)
     if len(names) < 2:
@@ -100,6 +103,7 @@ def bloc_flow_size(history, names):
     return float(total.mean()), float(total.max())
 
 
+# biggest one-direction run vs what the maker holds, holds dont end a run
 def bloc_run_demand(history, names, starting_inventory):
     names = list(names)
     if not names:
@@ -130,6 +134,7 @@ def bloc_run_demand(history, names, starting_inventory):
     return percent, longest_run
 
 
+#same rule, only a sign change ends a run
 def flow_runs(total):
     runs = []
     running = 0.0
