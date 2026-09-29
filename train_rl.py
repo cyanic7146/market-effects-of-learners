@@ -60,7 +60,7 @@ model = PPO("MlpPolicy", env, verbose=1,
             n_epochs=5)
 model.learn(total_timesteps=1000000000, callback=eval_callback)
 
-best = PPO.load("MODELS/best_model_31obs")
+best = PPO.load("MODELS/best_model_31obs_checkpoint/best_model")
 best.save("MODELS/rl_model_best_improved_v1000")
 
 print("\ntraining done, running eval episode...")
